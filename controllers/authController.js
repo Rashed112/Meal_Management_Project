@@ -1,67 +1,42 @@
 import User from '../models/UserModel.js';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import { StatusCodes } from 'http-status-codes';
+import { comparePassword, hashPassword } from '../utils/passwordUtils.js';
+import { UnauthenticatedError } from '../errors/customErrors.js';
+import { createJWT } from '../utils/tokenUtils.js';
 
 export const register = async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const isFirstAccount = (await User.countDocuments()) === 0;
+  req.body.role = isFirstAccount ? 'admin' : 'user';
+  req.body.password = await hashPassword(req.body.password);
 
-  try {
-    let user = await User.findOne({ email });
-    if (user) {
-      return res.status(400).json({ msg: 'User already exists' });
-    }
-
-    user = new User({ name, email, password, role });
-
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
-
-    await user.save();
-
-    const payload = {
-      user: { id: user.id, role: user.role }
-    };
-
-    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
-      if (err) throw err;
-      res.json({ token });
-    });
-
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
-  }
+  const user = await User.create(req.body);
+  res.status(StatusCodes.CREATED).json({ msg: 'user created' });
 };
 
 export const login = async (req, res) => {
-  const { email, password } = req.body;
+  const user = await User.findOne({ email: req.body.email });
 
-  try {
-    let user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ msg: 'Invalid credentials' });
-    }
+  const isValidUser =
+    user && (await comparePassword(req.body.password, user.password));
 
-    if (user.isBanned) {
-      return res.status(403).json({ msg: 'User is banned' });
-    }
+  if (!isValidUser) throw new UnauthenticatedError('invalid credentials');
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ msg: 'Invalid credentials' });
-    }
+  const token = createJWT({ userId: user._id, role: user.role });
 
-    const payload = {
-      user: { id: user.id, role: user.role }
-    };
+  const oneDay = 1000 * 60 * 60 * 24;
 
-    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
-      if (err) throw err;
-      res.json({ token });
-    });
+  res.cookie('token', token, {
+    httpOnly: true,
+    expires: new Date(Date.now() + oneDay),
+    secure: process.env.NODE_ENV === 'production',
+  });
+  res.status(StatusCodes.OK).json({ msg: 'user logged in' });
+};
 
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
-  }
+export const logout = (req, res) => {
+  res.cookie('token', 'logout', {
+    httpOnly: true,
+    expires: new Date(Date.now()),
+  });
+  res.status(StatusCodes.OK).json({ msg: 'user logged out!' });
 };
