@@ -1,3 +1,4 @@
+import 'express-async-errors';
 import * as dotenv from 'dotenv';
 dotenv.config();
 import express from 'express';
@@ -12,9 +13,18 @@ import itemRouter from './routes/itemRouter.js';
 import mealRouter from './routes/mealRouter.js';
 import mealScheduleRouter from './routes/mealScheduleRouter.js';
 
+//public
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+import path from 'path';
+
 // middleware
 import errorHandlerMiddleware from './middleware/errorHandlerMiddleware.js';
 import { authenticateUser } from './middleware/authMiddleware.js';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+app.use(express.static(path.resolve(__dirname, './client/dist')));
 
 app.use(cookieParser());
 app.use(express.json());
@@ -30,7 +40,6 @@ app.use('*', (req, res) => {
 });
 
 app.use(errorHandlerMiddleware);
-
 
 const port = process.env.PORT || 5100;
 try {
