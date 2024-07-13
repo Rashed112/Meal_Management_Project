@@ -65,6 +65,18 @@ const router = createBrowserRouter([
           />
         ),
         loader: dashboardLoader(queryClient),
+        children: [
+          {
+            path:'meals',
+            element: <Meals />,
+          },
+          {
+            path: 'users',
+            element: <Users />,
+          },
+          
+          
+        ],
       },
     ],
   },

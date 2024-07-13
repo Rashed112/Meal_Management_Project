@@ -23,8 +23,8 @@ const links = [
     icon: <IoBarChartSharp />,
   },
   {
-    text: 'items',
-    path: 'items',
+    text: 'users',
+    path: 'users',
     icon: <ImProfile />,
   },
   {
@@ -32,6 +32,11 @@ const links = [
     path: 'create-meal',
     icon: <MdAdminPanelSettings />,
   },
-]
+  {
+    text: 'profile',
+    path: 'profile',
+    icon: <ImProfile />,
+  },
+];
 
 export default links
