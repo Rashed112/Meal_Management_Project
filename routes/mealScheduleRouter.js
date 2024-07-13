@@ -5,8 +5,9 @@ import {
   createMealSchedule,
   updateMealSchedule,
   deleteMealSchedule,
+  getTodayMealSchedules,
 } from '../controllers/mealScheduleController.js';
-import { authenticateUser } from '../middleware/authMiddleware.js';
+import { authorizePermissions } from '../middleware/authMiddleware.js';
 
 router
   .route('/')
@@ -16,5 +17,8 @@ router
   .route('/:id')
   .patch(updateMealSchedule)
   .delete(deleteMealSchedule);
+router
+  .route('/today')
+  .get([authorizePermissions('admin')], getTodayMealSchedules);
 
 export default router;

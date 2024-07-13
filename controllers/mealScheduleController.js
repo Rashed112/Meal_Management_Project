@@ -127,3 +127,24 @@ export const deleteMealSchedule = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+export const getTodayMealSchedules = async (req, res) => {
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const schedules = await MealSchedule.find({
+      date: {
+        $gte: today,
+        $lt: tomorrow,
+      },
+    }).populate('user meal');
+
+    res.json(schedules);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};

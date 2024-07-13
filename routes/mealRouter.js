@@ -6,12 +6,17 @@ import {
   updateMeal,
   deleteMeal,
 } from '../controllers/mealController.js';
-import { authenticateUser, authorizePermissions } from '../middleware/authMiddleware.js';
+import {
+  authenticateUser,
+  authorizePermissions,
+} from '../middleware/authMiddleware.js';
 
-router.route('/').get(getMeals);
-router.route('/admin/').post([authorizePermissions('admin')], createMeal);
 router
-  .route('/admin/:id')
+  .route('/')
+  .get(getMeals)
+  .post([authorizePermissions('admin')], createMeal);
+router
+  .route('/:id')
   .patch([authorizePermissions('admin')], updateMeal)
   .delete([authorizePermissions('admin')], deleteMeal);
 
