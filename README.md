@@ -14,7 +14,7 @@
 
 ## Backend Features Added:
 
-- **Authentication**: JWT-based login and registration. (N.B: in my settings, the user who will be the **first entry of the user's list would be the ADMIN by default**)
+- **Authentication**: JWT-based login and registration. (N.B: in my settings, **The first registered user will be assigned the ADMIN role by default.**)
 - **User Management**:
   - Admins Only: Add, update, ban users.
   - General Users: Viewing own profile.
