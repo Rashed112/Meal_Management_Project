@@ -10,5 +10,3 @@ export { default as Meals} from './Meals';
 export { default as MealOrder} from './MealOrder';
 export { default as MealSchedule} from './MealSchedule';
 export { default as Users } from './Users';
-
-

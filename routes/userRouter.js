@@ -10,8 +10,10 @@ import {
   updateUser,
   deleteUser,
   getUserCount,
+  getCurrentUser,
 } from '../controllers/userController.js';
 
+router.route('/current-user').get(getCurrentUser);
 router
   .route('/')
   .get([authorizePermissions('admin')], getUsers)

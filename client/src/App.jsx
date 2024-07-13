@@ -18,6 +18,15 @@ import {
 
 import { action as loginAction } from './pages/Login';
 import { action as registerAction } from './pages/Register';
+import { loader as dashboardLoader } from './pages/DashboardLayout';
+
+const checkDefaultTheme = () => {
+  const isDarkTheme = localStorage.getItem('darkTheme') === 'true';
+  document.body.classList.toggle('dark-theme', isDarkTheme);
+  return isDarkTheme;
+};
+
+const isDarkThemeEnabled = checkDefaultTheme();
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -49,7 +58,13 @@ const router = createBrowserRouter([
       },
       {
         path: 'dashboard',
-        element: <DashboardLayout />,
+        element: (
+          <DashboardLayout
+            isDarkThemeEnabled={isDarkThemeEnabled}
+            queryClient={queryClient}
+          />
+        ),
+        loader: dashboardLoader(queryClient),
       },
     ],
   },
